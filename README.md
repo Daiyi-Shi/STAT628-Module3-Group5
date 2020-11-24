@@ -2,6 +2,6 @@
  
 ## Member
 
-Daiyi Shi ()
+Daiyi Shi (dshi42)
 Zijun Feng ()
 Hanlin Tang (htang79)
