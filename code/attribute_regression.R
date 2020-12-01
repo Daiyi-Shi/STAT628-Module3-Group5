@@ -40,3 +40,22 @@ summary(model)
 fastfood_model_summary<-summary(model)$coefficients[-1,]
 p_fdr<-p.adjust(fastfood_model_summary[,4], method = "fdr", n = length(fastfood_model_summary[,4]))
 sig_list<-rownames(fastfood_model_summary[p_fdr<0.10, ])
+sig_list
+
+sig_col_list = c('BikeParking', 'Caters', 'OutdoorSeating', 'RestaurantsDelivery', 'RestaurantsTableService', 'WheelchairAccessible')
+for(sig in sig_col_list){
+  filter_data = data[!is.na(data[sig]),]
+  print(paste(sig, t.test(filter_data[filter_data[sig] == 'True', 'star_y'], 
+         filter_data[filter_data[sig] == 'False', 'star_y'])$p.value))
+}
+
+filter_data = data[!is.na(data$NoiseLevel),]
+t.test(filter_data[(filter_data$NoiseLevel == 'loud' | filter_data$NoiseLevel == 'very'), 'star_y'], 
+       filter_data[(filter_data$NoiseLevel == 'average' | filter_data$NoiseLevel == 'quiet'), 'star_y'])
+
+sig_col_list = c('WheelchairAccessible')
+
+filter_data = sub_data[!is.na(data['WheelchairAccessible']),]
+filter_model = lm(star_y~., data=filter_data)
+summary(filter_model)
+
