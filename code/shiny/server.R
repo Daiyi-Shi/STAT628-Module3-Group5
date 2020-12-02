@@ -198,31 +198,36 @@ server <- function(input, output, session) {
   })
   
   output$Caters <- renderText({
-    res<-table(atb[,c("name", "Caters")])[input$restaurant,]
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("name", "Caters")])[business_id,]
     condition = res["TRUE"]
     paste0("Your restaurant ",  if(condition) "can " else "can not", "cater parties, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$NoiseLevel <- renderText({
-    res<-table(atb[,c("name", "NoiseLevel")])[input$restaurant,]
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("name", "NoiseLevel")])[business_id,]
     condition = res["loud"]+res["very"]
     paste0("Your restaurant ", if(condition) "are noisy " else "are quiet ", "which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$OutdoorSeating <- renderText({
-    res<-table(atb[,c("name", "Caters")])[input$restaurant,]
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("name", "Caters")])[business_id,]
     condition = res["TRUE"]
     paste0("Your restaurant ", if(condition) "have " else "does not have", "outdoor seatings, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$RestaurantsDelivery <- renderText({
-    res<-table(atb[,c("name", "RestaurantsDelivery")])[input$restaurant,]
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("name", "RestaurantsDelivery")])[business_id,]
     condition = res["TRUE"]
     paste0("Your restaurant ", if(condition) "can " else "can not", "delivery food, which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$RestaurantsTableService <- renderText({
-    res<-table(atb[,c("name", "RestaurantsTableService")])[input$restaurant,]
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("name", "RestaurantsTableService")])[business_id,]
     condition = res["TRUE"]
     paste0("Your restaurant ", if(condition) "have " else "does not have", "table service, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
