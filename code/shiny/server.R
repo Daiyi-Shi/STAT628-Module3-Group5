@@ -10,18 +10,42 @@ info <- info[order(info$all_restaurant), ]
 atb <- read.csv('fastfood_attributes.csv')
 atb <- atb[order(atb$name), ]
 
+address <- read.csv('fastfood_address.csv')
+address$business_id <- as.character(address$business_id)
+address$name <- as.character(address$name)
+address$full_address <- as.character(address$full_address)
+address$postal_code <- as.character(address$postal_code)
+
+get_business_id <- function(restaurant, full_address){
+  address_list = address[address$name == restaurant,]
+  if(nrow(address_list) > 1){
+    address_list = address_list[address_list$full_address == full_address,]
+  }
+  return(address_list[1,1])
+}
+
 server <- function(input, output, session) {
   
+  observeEvent(input$restaurant, {
+    address_list = address[address$name == input$restaurant,]
+    address_list = address_list[order(address_list$postal_code),]
+    # address_list = paste(address_list$address, address_list$city, address_list$state, address_list$postal_code, sep=", ")
+    updateSelectInput(session, inputId = 'address', choices = address_list$full_address)
+  })
+  
   percentiles <- eventReactive(input$calculate_botton, {
-    data[data$all_restaurant==input$restaurant,2:7]
+    business_id = get_business_id(input$restaurant, input$address)
+    data[data$all_restaurant==business_id,2:7]
   })
   
   num_reviews <- eventReactive(input$calculate_botton, {
-    info$all_number[info$all_restaurant==input$restaurant]
+    business_id = get_business_id(input$restaurant, input$address)
+    info$all_number[info$all_restaurant==business_id]
   })
   
   avg_stars <- eventReactive(input$calculate_botton, {
-    info$all_stars[info$all_restaurant==input$restaurant]
+    business_id = get_business_id(input$restaurant, input$address)
+    info$all_stars[info$all_restaurant==business_id]
   })
   
   output$reviewNum <- renderText({
@@ -159,39 +183,48 @@ server <- function(input, output, session) {
     }
   })
   
-  output$branchNum <- renderText({
-    res<-table(atb[,"name"])[input$restaurant]
-    paste0("There are ", '<span style="color:orange;">', res, '</span>', " branch restaurants in total.")
-  })
+  # output$branchNum <- renderText({
+  #   res<-table(atb[,"name"])[input$restaurant]
+  #   paste0("There are ", '<span style="color:orange;">', res, '</span>', " branch restaurants in total.")
+  # })
+  green_positive = '<span style="color:green;"> positive </span>'
+  red_negative = '<span style="color:red;"> negative </span>'
   
   output$BikeParking <- renderText({
-    res<-table(atb[,c("name", "BikeParking")])[input$restaurant,]
-    paste0(res["TRUE"], " branch restaurants have bike parking place, which has ", '<span style="color:green;">', "positive", '</span>', " effect on restaurant rate.")
+    business_id = get_business_id(input$restaurant, input$address)
+    res<-table(atb[,c("business_id", "BikeParking")])[business_id,]
+    condition = res["TRUE"]
+    paste0("Your restaurant ",  if(condition) "have " else "does not have", "bike parking place, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$Caters <- renderText({
     res<-table(atb[,c("name", "Caters")])[input$restaurant,]
-    paste0(res["TRUE"], " branch restaurants can cater parties, which has ", '<span style="color:green;">', "positive", '</span>', " effect on restaurant rate.")
+    condition = res["TRUE"]
+    paste0("Your restaurant ",  if(condition) "can " else "can not", "cater parties, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$NoiseLevel <- renderText({
     res<-table(atb[,c("name", "NoiseLevel")])[input$restaurant,]
-    paste0(res["loud"]+res["very"], " branch restaurants are noisy, which has ", '<span style="color:red;">', "negative", '</span>', " effect on restaurant rate.")
+    condition = res["loud"]+res["very"]
+    paste0("Your restaurant ", if(condition) "are noisy " else "are quiet ", "which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$OutdoorSeating <- renderText({
     res<-table(atb[,c("name", "Caters")])[input$restaurant,]
-    paste0(res["TRUE"], " branch restaurants have outdoor seatings, which has ", '<span style="color:green;">', "positive", '</span>', " effect on restaurant rate.")
+    condition = res["TRUE"]
+    paste0("Your restaurant ", if(condition) "have " else "does not have", "outdoor seatings, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$RestaurantsDelivery <- renderText({
     res<-table(atb[,c("name", "RestaurantsDelivery")])[input$restaurant,]
-    paste0(res["TRUE"], " branch restaurants can delivery food, which has ", '<span style="color:red;">', "negative", '</span>', " effect on restaurant rate.")
+    condition = res["TRUE"]
+    paste0("Your restaurant ", if(condition) "can " else "can not", "delivery food, which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$RestaurantsTableService <- renderText({
     res<-table(atb[,c("name", "RestaurantsTableService")])[input$restaurant,]
-    paste0(res["TRUE"], " branch restaurants have table service, which has ", '<span style="color:green;">', "positive", '</span>', " effect on restaurant rate.")
+    condition = res["TRUE"]
+    paste0("Your restaurant ", if(condition) "have " else "does not have", "table service, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
 }

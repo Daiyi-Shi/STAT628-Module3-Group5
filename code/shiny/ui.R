@@ -7,6 +7,9 @@ data <- data[order(data$all_restaurant), ]
 info <- read.csv(file = "restaurant_info.csv", header = T)
 info <- info[order(info$all_restaurant), ]
 
+address <- read.csv('fastfood_address.csv')
+address$name <- as.character(address$name)
+
 ui <- fluidPage(
   titlePanel(h1(id = "title","Advises for Fast Food Restaurant",align = "center")),
   tags$style(HTML("#title{font-size: 50px;font-family: Georgia;}")),
@@ -18,8 +21,10 @@ ui <- fluidPage(
       
       helpText("Our advises are available for all stores with the same name"),
 
-      selectInput("restaurant",label="Unit",
-                  choices=data$all_restaurant, selected="Arby's", multiple=F),
+      selectInput("restaurant",label="Brand",
+                  choices=sort(unique(address$name)), selected="Arby's", multiple=F),
+      selectInput("address",label="Address (ordered by postal code)",
+                  choices=c(), multiple=F),
       
       actionButton("calculate_botton", "Button", style = "color: white; background-color: #4040ff" ),
       width=4
