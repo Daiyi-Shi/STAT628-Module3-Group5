@@ -9,6 +9,8 @@ if (!require("stringr")) {
   stopifnot(require("stringr"))
 }
 
+# run word_embedding.py first to get fastfood_embedded.csv
+# fastfood_embedded.csv is about 500 MB, which is too large so we didn't upload it to github.
 # read data
 fastfood0<-as.data.frame(fread("../data/fastfood_embedded.csv"))
 fastfood0<-fastfood0[fastfood0$words!="",]
@@ -56,6 +58,7 @@ par(mfrow=c(1,1))
 
 # linear regression by using word embedding matrix
 fastfood<-fastfood0[, c(3, 16:(ncol(fastfood0)))]
+# It may take around 10 minutes to fit this model.
 fastfood_model<-lm(stars_x~., data=fastfood)
 fastfood_model_summary<-summary(fastfood_model)$coefficients[-1,]
 p_fdr<-p.adjust(fastfood_model_summary[,4], method = "fdr", n = length(fastfood_model_summary[,4]))
@@ -120,7 +123,7 @@ corr_pval
 
 write.csv(cbind(all_restaurant, all_percentile), "../data/restaurant_score.csv", row.names=F)
 
-restaurant_percentile<-cbind(stars=restaurant_average_stars[all_restaurant], all_percentile)
+restaurant_percentile<-cbind(stars=restaurant_average_stars, all_percentile)
 rownames(restaurant_percentile)<-1:nrow(restaurant_percentile)
 restaurant_percentile_model<-lm(stars~., restaurant_percentile)
 summary(restaurant_percentile_model)
