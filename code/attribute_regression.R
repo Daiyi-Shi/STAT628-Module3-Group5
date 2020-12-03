@@ -1,4 +1,4 @@
-data = read.csv('fastfood_attributes(2).csv')
+data = read.csv('../fastfood_attributes.csv')
 sub_data = data[, -c(1, 2)]
 
 fill_na = function(column, value){

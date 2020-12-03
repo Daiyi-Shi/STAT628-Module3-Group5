@@ -29,23 +29,23 @@ server <- function(input, output, session) {
   observeEvent(input$restaurant, {
     address_list = address[address$name == input$restaurant,]
     address_list = address_list[order(address_list$postal_code),]
-    # address_list = paste(address_list$address, address_list$city, address_list$state, address_list$postal_code, sep=", ")
     updateSelectInput(session, inputId = 'address', choices = address_list$full_address)
   })
   
+  business_id <- eventReactive(input$calculate_botton, {
+    get_business_id(input$restaurant, input$address)
+  })
+  
   percentiles <- eventReactive(input$calculate_botton, {
-    business_id = get_business_id(input$restaurant, input$address)
-    data[data$all_restaurant==business_id,2:7]
+    data[data$all_restaurant==business_id(),2:7]
   })
   
   num_reviews <- eventReactive(input$calculate_botton, {
-    business_id = get_business_id(input$restaurant, input$address)
-    info$all_number[info$all_restaurant==business_id]
+    info$all_number[info$all_restaurant==business_id()]
   })
   
   avg_stars <- eventReactive(input$calculate_botton, {
-    business_id = get_business_id(input$restaurant, input$address)
-    info$all_stars[info$all_restaurant==business_id]
+    info$all_stars[info$all_restaurant==business_id()]
   })
   
   output$reviewNum <- renderText({
@@ -113,7 +113,7 @@ server <- function(input, output, session) {
   
   output$clean1 <- renderText({
     if (is.na(percentiles()[3])){
-      paste0('<span style="color:orange;">', "There is no review about cleaness in this restaurant.", '</span>')
+      paste0('<span style="color:orange;">', "There is no review about cleanliess in this restaurant.", '</span>')
     }else if (percentiles()[3]>0.5){
       paste0('<span style="color:green;">', "The cleaness percentile among all fast food restaurant is ", round(percentiles()[3]*100, 2), "%.", '</span>')
     }else{
@@ -177,59 +177,74 @@ server <- function(input, output, session) {
   
   output$price2 <- renderText({
     if (is.na(percentiles()[6]) | percentiles()[6]<0.5){
-      "1. Food may be overcharged. Reduce the price if possible<br/>2. The product may not be consistent with your discription."
+      "1. Food may be overcharged. Reduce the price if possible<br/>2. The product may not be consistent with your description."
     }else{
       "There is no big problem with price in this restaurant."
     }
   })
   
-  # output$branchNum <- renderText({
-  #   res<-table(atb[,"name"])[input$restaurant]
-  #   paste0("There are ", '<span style="color:orange;">', res, '</span>', " branch restaurants in total.")
-  # })
   green_positive = '<span style="color:green;"> positive </span>'
   red_negative = '<span style="color:red;"> negative </span>'
   
   output$BikeParking <- renderText({
-    business_id = get_business_id(input$restaurant, input$address)
-    res<-table(atb[,c("business_id", "BikeParking")])[business_id,]
+    res<-table(atb[,c("business_id", "BikeParking")])[business_id(),]
     condition = res["TRUE"]
-    paste0("Your restaurant ",  if(condition) "have " else "does not have", "bike parking place, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
+    paste0("Your restaurant ",  if(condition) "have " else "does not have ", "bike parking place, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$Caters <- renderText({
+<<<<<<< HEAD
+    res<-table(atb[,c("business_id", "Caters")])[business_id(),]
+=======
     business_id = get_business_id(input$restaurant, input$address)
     res<-table(atb[,c("name", "Caters")])[business_id,]
+>>>>>>> 6f565b13142dcef2b0600d7efebd1010967f612a
     condition = res["TRUE"]
-    paste0("Your restaurant ",  if(condition) "can " else "can not", "cater parties, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
+    paste0("Your restaurant ",  if(condition) "can " else "can not ", "cater parties, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$NoiseLevel <- renderText({
+<<<<<<< HEAD
+    res<-table(atb[,c("business_id", "NoiseLevel")])[business_id(),]
+=======
     business_id = get_business_id(input$restaurant, input$address)
     res<-table(atb[,c("name", "NoiseLevel")])[business_id,]
+>>>>>>> 6f565b13142dcef2b0600d7efebd1010967f612a
     condition = res["loud"]+res["very"]
     paste0("Your restaurant ", if(condition) "are noisy " else "are quiet ", "which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$OutdoorSeating <- renderText({
+<<<<<<< HEAD
+    res<-table(atb[,c("business_id", "Caters")])[business_id(),]
+=======
     business_id = get_business_id(input$restaurant, input$address)
     res<-table(atb[,c("name", "Caters")])[business_id,]
+>>>>>>> 6f565b13142dcef2b0600d7efebd1010967f612a
     condition = res["TRUE"]
-    paste0("Your restaurant ", if(condition) "have " else "does not have", "outdoor seatings, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
+    paste0("Your restaurant ", if(condition) "have " else "does not have ", "outdoor seatings, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
   output$RestaurantsDelivery <- renderText({
+<<<<<<< HEAD
+    res<-table(atb[,c("business_id", "RestaurantsDelivery")])[business_id(),]
+=======
     business_id = get_business_id(input$restaurant, input$address)
     res<-table(atb[,c("name", "RestaurantsDelivery")])[business_id,]
+>>>>>>> 6f565b13142dcef2b0600d7efebd1010967f612a
     condition = res["TRUE"]
-    paste0("Your restaurant ", if(condition) "can " else "can not", "delivery food, which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
+    paste0("Your restaurant ", if(condition) "can " else "can not ", "delivery food, which has ", if(condition) red_negative else green_positive, " effect on restaurant rate.")
   })
   
   output$RestaurantsTableService <- renderText({
+<<<<<<< HEAD
+    res<-table(atb[,c("business_id", "RestaurantsTableService")])[business_id(),]
+=======
     business_id = get_business_id(input$restaurant, input$address)
     res<-table(atb[,c("name", "RestaurantsTableService")])[business_id,]
+>>>>>>> 6f565b13142dcef2b0600d7efebd1010967f612a
     condition = res["TRUE"]
-    paste0("Your restaurant ", if(condition) "have " else "does not have", "table service, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
+    paste0("Your restaurant ", if(condition) "have " else "does not have ", "table service, which has ", if(condition) green_positive else red_negative, " effect on restaurant rate.")
   })
   
 }
